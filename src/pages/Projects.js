@@ -1,28 +1,32 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import './Projects.css';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import "./Projects.css";
 
 const PROJECTS = {
   client: [
-    { id: 1, driveId: '1kLu1xB-nZ1jgciDCb1dk3HNjhQozzrXQ' },
-    { id: 2, driveId: '1TKG_d0NyaAFVMc2LwQOmRQfj6XhKX_C8' },
-    { id: 3, driveId: '1R-jHt3l6rJwiYjAgXnZdyn-u5jlky6Z5' },
-    { id: 4, driveId: '1TuUcvxbY_VEP_SHWnZ1by2MLNT4AJGrZ' },
-    { id: 5, driveId: '1xebUY4lRZGq-R4EfRlMcGNd8KY-SnHhE' },
-    { id: 6, driveId: '1KC_0YOuKaEZoAeZPmdNKPV7JC28pJIce' },
-    { id: 7, driveId: '1_8tsLwTUPPjwcJEYtpuMjPbH0GOlOsZX' },
-    { id: 8, driveId: '1aBefknyW5kPAkexZs5-3JsS2o3XJ8BY0' },
+    { id: 1, driveId: "1kLu1xB-nZ1jgciDCb1dk3HNjhQozzrXQ" },
+    { id: 2, driveId: "1TKG_d0NyaAFVMc2LwQOmRQfj6XhKX_C8" },
+    { id: 3, driveId: "1R-jHt3l6rJwiYjAgXnZdyn-u5jlky6Z5" },
+    { id: 4, driveId: "1TuUcvxbY_VEP_SHWnZ1by2MLNT4AJGrZ" },
+    { id: 5, driveId: "1xebUY4lRZGq-R4EfRlMcGNd8KY-SnHhE" },
+    { id: 6, driveId: "1KC_0YOuKaEZoAeZPmdNKPV7JC28pJIce" },
+    { id: 7, driveId: "1_8tsLwTUPPjwcJEYtpuMjPbH0GOlOsZX" },
+    { id: 8, driveId: "1aBefknyW5kPAkexZs5-3JsS2o3XJ8BY0" },
   ],
   personal: [],
   freelance: [],
 };
 
 const TABS = [
-  { key: 'client', label: 'Client Work' },
-  { key: 'personal', label: 'Personal' },
-  { key: 'freelance', label: 'Freelance' },
+  { key: "client", label: "Client Work" },
+  { key: "personal", label: "Personal" },
+  { key: "freelance", label: "Freelance" },
 ];
-
-const SLICE_COUNT = 8;
 
 function ThumbVisual() {
   return (
@@ -38,71 +42,131 @@ function ThumbVisual() {
         <span className="thumb-rule" />
       </div>
       <span className="thumb-play" aria-hidden="true">
-        {'\u25B6  PLAY'}
+        {"\u25B6  PLAY"}
       </span>
     </div>
   );
 }
 
+function ProjectFrame({ project, className }) {
+  if (!project) return null;
+
+  return (
+    <div className={className}>
+      <iframe
+        className="modal-iframe"
+        src={`https://drive.google.com/file/d/${project.driveId}/preview`}
+        title={`Project ${project.id}`}
+        sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+        allow="autoplay; encrypted-media"
+        allowFullScreen={true}
+      />
+    </div>
+  );
+}
+
 export default function Projects() {
-  const [activeTab, setActiveTab] = useState('client');
-  const [displayTab, setDisplayTab] = useState('client');
+  const [activeTab, setActiveTab] = useState("client");
+  const [displayTab, setDisplayTab] = useState("client");
   const [tabTransition, setTabTransition] = useState(false);
-  const [gridEntering, setGridEntering] = useState(false);
   const [pillStyle, setPillStyle] = useState({});
-  const [pillReady, setPillReady] = useState(false);
+  const [pillTransitionEnabled, setPillTransitionEnabled] = useState(false);
+  const [pillBouncing, setPillBouncing] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalIndex, setModalIndex] = useState(0);
-  const [modalTransition, setModalTransition] = useState('idle');
-  const [switchDirection, setSwitchDirection] = useState('right');
-  const [switchPhase, setSwitchPhase] = useState('idle');
+  const [modalTransition, setModalTransition] = useState("idle");
+  const [originPos, setOriginPos] = useState({ x: 50, y: 50 });
+  const [switchDir, setSwitchDir] = useState(null);
+  const [switchStage, setSwitchStage] = useState("idle");
+  const [switchingProject, setSwitchingProject] = useState(null);
+  const [pulseIndex, setPulseIndex] = useState(null);
 
-  const flashRef = useRef(null);
-  const slicesRef = useRef(null);
   const tabRefs = useRef({});
   const tabContainerRef = useRef(null);
+  const cardRefs = useRef([]);
+  const pillRafRef = useRef(null);
+  const bounceRafRef = useRef(null);
+  const didMountRef = useRef(false);
   const timeoutsRef = useRef([]);
 
   const currentProjects = PROJECTS[displayTab] || [];
   const currentProject = currentProjects[modalIndex] || null;
-
-  const addTimeout = useCallback((callback, delay) => {
-    const timeoutId = setTimeout(callback, delay);
-    timeoutsRef.current.push(timeoutId);
-    return timeoutId;
-  }, []);
 
   const clearAllTimeouts = useCallback(() => {
     timeoutsRef.current.forEach((timeoutId) => clearTimeout(timeoutId));
     timeoutsRef.current = [];
   }, []);
 
-  const recalcPill = useCallback(() => {
-    const container = tabContainerRef.current;
-    const activeEl = tabRefs.current[activeTab];
-    if (!container || !activeEl) return;
+  const queueTimeout = useCallback((callback, delay) => {
+    const timeoutId = setTimeout(callback, delay);
+    timeoutsRef.current.push(timeoutId);
+  }, []);
 
-    const cRect = container.getBoundingClientRect();
-    const aRect = activeEl.getBoundingClientRect();
-    setPillStyle({
-      left: `${aRect.left - cRect.left - 4}px`,
-      width: `${aRect.width}px`,
-    });
-  }, [activeTab]);
+  const cancelPillFrame = () => {
+    if (pillRafRef.current) {
+      cancelAnimationFrame(pillRafRef.current);
+      pillRafRef.current = null;
+    }
+    if (bounceRafRef.current) {
+      cancelAnimationFrame(bounceRafRef.current);
+      bounceRafRef.current = null;
+    }
+  };
 
-  const startModalEnter = useCallback(
+  const measurePill = useCallback(
+    (disableTransition = false) => {
+      const container = tabContainerRef.current;
+      const activeEl = tabRefs.current[activeTab];
+      if (!container || !activeEl) return;
+
+      const cRect = container.getBoundingClientRect();
+      const aRect = activeEl.getBoundingClientRect();
+
+      setPillStyle({
+        width: `${aRect.width}px`,
+        transform: `translateX(${aRect.left - cRect.left}px)`,
+        transition: disableTransition ? "none" : undefined,
+      });
+
+      cancelPillFrame();
+      pillRafRef.current = requestAnimationFrame(() => {
+        setPillStyle({
+          width: `${aRect.width}px`,
+          transform: `translateX(${aRect.left - cRect.left}px)`,
+          transition: undefined,
+        });
+        setPillTransitionEnabled(true);
+      });
+    },
+    [activeTab],
+  );
+
+  const handleCardClick = useCallback(
     (index) => {
-      if (!currentProjects[index]) return;
+      const el = cardRefs.current[index];
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        const cx = ((rect.left + rect.width / 2) / window.innerWidth) * 100;
+        const cy = ((rect.top + rect.height / 2) / window.innerHeight) * 100;
+        setOriginPos({ x: cx, y: cy });
+      }
+
       clearAllTimeouts();
+      setPulseIndex(index);
+      queueTimeout(() => {
+        setPulseIndex(null);
+      }, 200);
       setModalIndex(index);
       setModalOpen(true);
-      setModalTransition('entering');
-      setSwitchPhase('idle');
-      addTimeout(() => {
-        setModalTransition('active');
-      }, 600);
+      setModalTransition("idle");
+      queueTimeout(() => {
+        setModalTransition("open");
+      }, 20);
+      setSwitchDir(null);
+      setSwitchStage("idle");
+      setSwitchingProject(null);
     },
-    [addTimeout, clearAllTimeouts, currentProjects],
+    [clearAllTimeouts, queueTimeout],
   );
 
   const closeModal = useCallback(
@@ -113,15 +177,19 @@ export default function Projects() {
       }
 
       clearAllTimeouts();
-      setModalTransition('exiting');
-      setSwitchPhase('idle');
-      addTimeout(() => {
+      setModalTransition("closing");
+      setSwitchDir(null);
+      setSwitchStage("idle");
+      setSwitchingProject(null);
+      setPulseIndex(null);
+
+      queueTimeout(() => {
         setModalOpen(false);
-        setModalTransition('idle');
+        setModalTransition("idle");
         if (afterClose) afterClose();
-      }, 300);
+      }, 500);
     },
-    [addTimeout, clearAllTimeouts, modalOpen],
+    [clearAllTimeouts, modalOpen, queueTimeout],
   );
 
   const runTabTransition = useCallback(
@@ -129,55 +197,52 @@ export default function Projects() {
       clearAllTimeouts();
       setModalIndex(0);
       setTabTransition(true);
-      setGridEntering(false);
 
-      addTimeout(() => {
+      queueTimeout(() => {
         setDisplayTab(tabKey);
         setActiveTab(tabKey);
-      }, 200);
+      }, 150);
 
-      addTimeout(() => {
+      queueTimeout(() => {
         setTabTransition(false);
-        setGridEntering(true);
-      }, 220);
-
-      addTimeout(() => {
-        setGridEntering(false);
-      }, 560);
+      }, 165);
     },
-    [addTimeout, clearAllTimeouts],
+    [clearAllTimeouts, queueTimeout],
   );
 
   const switchProject = useCallback(
     (direction) => {
-      if (!modalOpen || modalTransition === 'switching') return;
+      if (!modalOpen || modalTransition !== "open" || switchDir) return;
 
-      const delta = direction === 'right' ? 1 : -1;
+      const delta = direction === "right" ? 1 : -1;
       const nextIndex = modalIndex + delta;
       if (nextIndex < 0 || nextIndex >= currentProjects.length) return;
 
       clearAllTimeouts();
-      setSwitchDirection(direction);
-      setSwitchPhase('out');
-      setModalTransition('switching');
+      setSwitchDir(direction);
+      setSwitchStage("out");
+      setSwitchingProject(currentProject);
 
-      addTimeout(() => {
+      queueTimeout(() => {
         setModalIndex(nextIndex);
-        setSwitchPhase('in');
+        setSwitchStage("in");
       }, 180);
 
-      addTimeout(() => {
-        setSwitchPhase('idle');
-        setModalTransition('active');
-      }, 460);
+      queueTimeout(() => {
+        setSwitchDir(null);
+        setSwitchStage("idle");
+        setSwitchingProject(null);
+      }, 500);
     },
     [
-      addTimeout,
       clearAllTimeouts,
+      currentProject,
       currentProjects.length,
       modalIndex,
       modalOpen,
       modalTransition,
+      queueTimeout,
+      switchDir,
     ],
   );
 
@@ -193,126 +258,146 @@ export default function Projects() {
     [activeTab, closeModal, modalOpen, runTabTransition],
   );
 
-  useEffect(() => {
-    recalcPill();
-    window.addEventListener('resize', recalcPill);
-    return () => {
-      window.removeEventListener('resize', recalcPill);
+  useLayoutEffect(() => {
+    measurePill(!pillTransitionEnabled);
+
+    const handleResize = () => {
+      measurePill(true);
     };
-  }, [recalcPill]);
 
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      setPillReady(true);
-    }, 50);
-
+    window.addEventListener("resize", handleResize);
     return () => {
-      clearTimeout(timeoutId);
+      window.removeEventListener("resize", handleResize);
+      cancelPillFrame();
     };
-  }, []);
+  }, [measurePill, pillTransitionEnabled]);
 
   useEffect(() => {
-    if (!(modalOpen && modalTransition === 'entering')) return;
-
-    if (flashRef.current) {
-      flashRef.current.classList.remove('is-active');
-      void flashRef.current.offsetWidth;
-      flashRef.current.classList.add('is-active');
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
     }
 
-    if (slicesRef.current) {
-      slicesRef.current.classList.remove('is-active');
-      void slicesRef.current.offsetWidth;
-      slicesRef.current.classList.add('is-active');
-    }
-  }, [modalOpen, modalTransition]);
+    setPillBouncing(false);
+    bounceRafRef.current = requestAnimationFrame(() => {
+      setPillBouncing(true);
+    });
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (!pillBouncing) return;
+    queueTimeout(() => {
+      setPillBouncing(false);
+    }, 360);
+  }, [pillBouncing, queueTimeout]);
 
   useEffect(() => {
     if (!modalOpen) return;
 
     const onKeyDown = (event) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         closeModal();
       }
-      if (event.key === 'ArrowRight') {
-        switchProject('right');
+      if (event.key === "ArrowRight") {
+        switchProject("right");
       }
-      if (event.key === 'ArrowLeft') {
-        switchProject('left');
+      if (event.key === "ArrowLeft") {
+        switchProject("left");
       }
     };
 
-    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener("keydown", onKeyDown);
     return () => {
-      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener("keydown", onKeyDown);
     };
   }, [closeModal, modalOpen, switchProject]);
 
   useEffect(() => {
-    if (modalOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [modalOpen]);
-
-  useEffect(() => {
     return () => {
       clearAllTimeouts();
-      document.body.style.overflow = '';
+      cancelPillFrame();
     };
   }, [clearAllTimeouts]);
 
   return (
     <section className="projects-page">
-      <div
-        ref={tabContainerRef}
-        className="projects-tabs"
-        role="tablist"
-        aria-label="Project categories"
-      >
+      <div className="projects-tabs-shell">
         <div
-          className={`projects-tab-pill ${pillReady ? '' : 'no-transition'}`}
-          style={pillStyle}
-          aria-hidden="true"
-        />
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            ref={(el) => {
-              tabRefs.current[tab.key] = el;
-            }}
-            type="button"
-            className={`projects-tab ${activeTab === tab.key ? 'is-active' : ''}`}
-            onClick={() => handleTabChange(tab.key)}
+          ref={tabContainerRef}
+          className="projects-tabs"
+          role="tablist"
+          aria-label="Project categories"
+        >
+          <div
+            className="projects-tab-pill-track"
+            style={pillStyle}
+            aria-hidden="true"
           >
-            {tab.label}
-          </button>
-        ))}
+            <div
+              className={`projects-tab-pill ${pillBouncing ? "is-bouncing" : ""}`}
+            />
+          </div>
+          {TABS.map((tab) => (
+            <button
+              key={tab.key}
+              ref={(el) => {
+                tabRefs.current[tab.key] = el;
+              }}
+              type="button"
+              className={`projects-tab ${activeTab === tab.key ? "is-active" : ""}`}
+              onClick={() => handleTabChange(tab.key)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div
-        className={`projects-grid-wrap ${tabTransition ? 'grid-dissolve-out' : ''} ${gridEntering ? 'grid-dissolve-in' : ''}`}
+        className={`projects-grid-wrapper ${tabTransition ? "grid-transition-out" : ""} ${
+          modalOpen ? "grid-modal-active" : ""
+        } ${modalTransition === "closing" ? "grid-rack-reset" : ""}`}
       >
         <div className="grid-glow" aria-hidden="true" />
         {currentProjects.length > 0 ? (
-          <div className="projects-grid">
+          <div key={displayTab} className="projects-grid grid-animating">
             {currentProjects.map((project, index) => {
               const isActive = modalOpen && index === modalIndex;
+              const isPulsing = pulseIndex === index;
               return (
                 <button
                   key={project.id}
+                  ref={(el) => {
+                    cardRefs.current[index] = el;
+                  }}
                   type="button"
-                  className={`thumb-card ${isActive ? 'is-active' : ''}`}
-                  style={{ '--card-delay': `${(index % 8) * 40}ms` }}
-                  onClick={() => startModalEnter(index)}
+                  className={`thumb-card card-enter-${index % 8} ${isActive ? "is-active" : ""} ${
+                    isPulsing ? "is-pulsing" : ""
+                  }`}
+                  style={{
+                    "--card-delay":
+                      index % 8 === 0
+                        ? "0ms"
+                        : index % 8 === 1
+                          ? "80ms"
+                          : index % 8 === 2
+                            ? "160ms"
+                            : index % 8 === 3
+                              ? "240ms"
+                              : index % 8 === 4
+                                ? "140ms"
+                                : index % 8 === 5
+                                  ? "220ms"
+                                  : index % 8 === 6
+                                    ? "300ms"
+                                    : "380ms",
+                  }}
+                  onClick={() => handleCardClick(index)}
                 >
                   <ThumbVisual />
-                  {isActive && <span className="thumb-top-accent" aria-hidden="true" />}
+                  {isActive && (
+                    <span className="thumb-top-accent" aria-hidden="true" />
+                  )}
                 </button>
               );
             })}
@@ -331,41 +416,35 @@ export default function Projects() {
         <>
           <div
             className={`projects-modal-backdrop ${
-              modalTransition === 'entering' ||
-              modalTransition === 'active' ||
-              modalTransition === 'switching'
-                ? 'is-visible'
-                : ''
-            } ${modalTransition === 'exiting' ? 'is-exiting' : ''}`}
+              modalTransition === "open"
+                ? "backdrop-open"
+                : modalTransition === "closing"
+                  ? "backdrop-closing"
+                  : "backdrop-closed"
+            }`}
+            style={{
+              "--ox": `${originPos.x}%`,
+              "--oy": `${originPos.y}%`,
+            }}
             onClick={() => closeModal()}
             aria-hidden="true"
           />
-
-          <div ref={flashRef} className="film-burn-flash" aria-hidden="true" />
-
-          <div ref={slicesRef} className="screen-slices" aria-hidden="true">
-            {Array.from({ length: SLICE_COUNT }).map((_, index) => (
-              <span
-                key={index}
-                className="screen-slice"
-                style={{ top: `${index * 12.5}vh` }}
-              />
-            ))}
-          </div>
 
           <button
             type="button"
             className="modal-close"
             onClick={() => closeModal()}
           >
-            {'\u2715  Close'}
+            {"\u2715  Close"}
           </button>
 
           <button
             type="button"
             className="modal-nav modal-nav-left"
-            onClick={() => switchProject('left')}
-            disabled={modalIndex === 0 || modalTransition === 'switching'}
+            onClick={() => switchProject("left")}
+            disabled={
+              modalIndex === 0 || modalTransition !== "open" || !!switchDir
+            }
             aria-label="Previous project"
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -376,10 +455,11 @@ export default function Projects() {
           <button
             type="button"
             className="modal-nav modal-nav-right"
-            onClick={() => switchProject('right')}
+            onClick={() => switchProject("right")}
             disabled={
               modalIndex === currentProjects.length - 1 ||
-              modalTransition === 'switching'
+              modalTransition !== "open" ||
+              !!switchDir
             }
             aria-label="Next project"
           >
@@ -390,31 +470,47 @@ export default function Projects() {
 
           <div
             className={`projects-modal-content ${
-              modalTransition === 'entering' ||
-              modalTransition === 'active' ||
-              modalTransition === 'switching'
-                ? 'is-entering'
-                : ''
-            } ${modalTransition === 'exiting' ? 'is-exiting' : ''}`}
+              modalTransition === "open"
+                ? "modal-visible"
+                : modalTransition === "closing"
+                  ? "modal-hidden"
+                  : "modal-prime"
+            }`}
           >
-            <div
-              className={`modal-video-shell ${
-                modalTransition === 'switching'
-                  ? `is-switching phase-${switchPhase} dir-${switchDirection}`
-                  : ''
-              }`}
-            >
-              <iframe
-                key={`${displayTab}-${modalIndex}`}
-                className="modal-iframe"
-                src={`https://drive.google.com/file/d/${currentProject.driveId}/preview`}
-                title={`Project ${currentProject.id}`}
-                sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-                allow="autoplay; encrypted-media"
-                allowFullScreen={true}
-              />
+            <div className="modal-video-shell">
+              {switchDir && switchingProject ? (
+                <>
+                  <ProjectFrame
+                    project={switchingProject}
+                    className={`modal-frame-layer is-out is-active ${
+                      switchDir === "right"
+                        ? "dissolve-out-left"
+                        : "dissolve-out-right"
+                    }`}
+                  />
+                  {switchStage === "in" && (
+                    <ProjectFrame
+                      project={currentProject}
+                      className={`modal-frame-layer is-in is-active ${
+                        switchDir === "right"
+                          ? "dissolve-in-right"
+                          : "dissolve-in-left"
+                      }`}
+                    />
+                  )}
+                </>
+              ) : (
+                <ProjectFrame
+                  project={currentProject}
+                  className={`modal-frame-layer is-static ${
+                    modalTransition === "open" ? "modal-bloom" : ""
+                  }`}
+                />
+              )}
             </div>
+          </div>
 
+          <div className="modal-meta">
             <div className="modal-counter">
               {modalIndex + 1} / {currentProjects.length}
             </div>
@@ -423,7 +519,7 @@ export default function Projects() {
               {currentProjects.map((project, index) => (
                 <span
                   key={project.id}
-                  className={`modal-dot ${index === modalIndex ? 'is-active' : ''}`}
+                  className={`modal-dot ${index === modalIndex ? "is-active" : ""}`}
                 />
               ))}
             </div>

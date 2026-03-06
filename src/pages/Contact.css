@@ -1,0 +1,153 @@
+.contact-page {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.contact-content {
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 100px 60px;
+}
+
+.contact-head {
+  text-align: center;
+}
+
+.contact-head h2 {
+  font-size: clamp(40px, 6vw, 72px);
+  line-height: 0.95;
+  font-weight: 800;
+}
+
+.contact-head h2 span {
+  display: block;
+  background: linear-gradient(120deg, var(--pink), var(--blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.availability {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: dotBlink 1.15s ease-in-out infinite;
+}
+
+.contact-grid {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 60px;
+}
+
+.mail-link {
+  font-size: 1.02rem;
+  font-weight: 500;
+  transition: color 0.25s ease;
+}
+
+.mail-link:hover {
+  background: linear-gradient(120deg, var(--pink), var(--blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.social-links {
+  margin-top: 16px;
+  display: grid;
+  gap: 8px;
+}
+
+.social-links a {
+  color: var(--muted);
+  font-size: 0.84rem;
+  transition: color 0.2s ease;
+}
+
+.social-links a:hover {
+  color: var(--white);
+}
+
+.contact-form {
+  display: grid;
+  gap: 8px;
+}
+
+.contact-form label {
+  margin-top: 6px;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  padding: 12px 0;
+  color: var(--white);
+  outline: none;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  border-bottom-color: var(--blue);
+  box-shadow: 0 10px 24px -18px var(--blue);
+}
+
+.contact-form button {
+  margin-top: 14px;
+  width: 100%;
+  border: none;
+  border-radius: 100px;
+  padding: 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(120deg, var(--pink), var(--blue));
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.contact-form button:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+@keyframes dotBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.32; }
+}
+
+@media (max-width: 768px) {
+  .contact-page {
+    height: calc(100vh - 60px);
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+
+  .contact-content {
+    padding: 28px 24px 80px;
+  }
+
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+}
