@@ -11,6 +11,7 @@ export default function App() {
   const [activePage, setActivePage] = useState("home");
   const [displayPage, setDisplayPage] = useState("home");
   const [transPhase, setTransPhase] = useState("idle");
+  const [homeVisitKey, setHomeVisitKey] = useState(0);
   const timeoutRefs = useRef([]);
 
   const clearAllTimeouts = () => {
@@ -30,7 +31,14 @@ export default function App() {
   }, []);
 
   const onNavigate = (newPage) => {
-    if (newPage === activePage || transPhase === "out") return;
+    if (transPhase === "out") return;
+
+    if (newPage === activePage) {
+      if (newPage === "home") {
+        setHomeVisitKey((prev) => prev + 1);
+      }
+      return;
+    }
 
     clearAllTimeouts();
     setTransPhase("out");
@@ -56,7 +64,9 @@ export default function App() {
 
       <main className="main-area">
         <div className={`page-wrapper page-phase-${transPhase}`}>
-          {displayPage === "home" && <Home onNavigate={onNavigate} />}
+          {displayPage === "home" && (
+            <Home key={`home-${homeVisitKey}`} onNavigate={onNavigate} />
+          )}
           {displayPage === "projects" && <Projects />}
           {displayPage === "experience" && <Experience />}
           {displayPage === "contact" && <Contact />}
