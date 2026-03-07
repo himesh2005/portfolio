@@ -1,5 +1,4 @@
-# Portfolio — Saksham Manchanda
-
+# Portfolio — Abhi Chakrapani
 A minimal React portfolio for a video editor.
 
 ## 🚀 Getting Started
@@ -10,7 +9,7 @@ A minimal React portfolio for a video editor.
 
 ### Install & Run
 
-```bash
+
 # 1. Navigate into the folder
 cd portfolio
 
