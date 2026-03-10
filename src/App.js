@@ -43,18 +43,18 @@ export default function App() {
     clearAllTimeouts();
     setTransPhase("out");
 
+    const OUT_DURATION_MS = 420;
+    const IN_DURATION_MS = 580;
+
     queueTimeout(() => {
       setDisplayPage(newPage);
       setActivePage(newPage);
-    }, 420);
-
-    queueTimeout(() => {
       setTransPhase("in");
-    }, 460);
+    }, OUT_DURATION_MS);
 
     queueTimeout(() => {
       setTransPhase("idle");
-    }, 1060);
+    }, OUT_DURATION_MS + IN_DURATION_MS);
   };
 
   return (

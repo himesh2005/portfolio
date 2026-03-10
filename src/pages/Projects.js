@@ -18,19 +18,69 @@ const PROJECTS = {
     { id: 7, driveId: "1_8tsLwTUPPjwcJEYtpuMjPbH0GOlOsZX" },
     { id: 8, driveId: "1CdmJQo2rkIx1YRf0q9W-iTnVRoTWDXB2" },
   ],
-  personal: [],
-  freelance: [],
+  personal: [
+    {
+      id: 1,
+      driveId: "13NjaKuBydG0_DiIYXOw518l2RqnWZP7E",
+      title: "Short Film",
+    },
+    {
+      id: 2,
+      driveId: "1aBefknyW5kPAkexZs5-3JsS2o3XJ8BY0",
+      title: "Bacon Avocado",
+    },
+  ],
+  freelance: [
+    {
+      id: 1,
+      driveId: "1EiKUlQJEH0PJHZoVWj-YSMOrIJl8upo2",
+      title: "Project 1",
+    },
+    {
+      id: 2,
+      driveId: "1IaO3gBsKEC4xGN7kIL4-LhoslmhrFSdf",
+      title: "Project 2",
+    },
+    {
+      id: 3,
+      driveId: "11Kkj5bGwJoG62UJ5PllQX3z9SCX9Q5rq",
+      title: "Project 3",
+    },
+    {
+      id: 4,
+      driveId: "1nFE6OS1febzTjX76FJnJb-_Eu6MCCL1R",
+      title: "Project 4",
+    },
+    {
+      id: 5,
+      driveId: "1D9BHu5kivAYD_uIjC4mz4Vzw3bIfm830",
+      title: "Project 5",
+    },
+  ],
 };
 
 const THUMB_VIDEOS = [
-  `${process.env.PUBLIC_URL}/gif/thumb-card card-enter-0.mp4`,
-  `${process.env.PUBLIC_URL}/gif/thumb-card card-enter-1.mp4`,
-  `${process.env.PUBLIC_URL}/gif/thumb-card card-enter-2.mp4`,
-  `${process.env.PUBLIC_URL}/gif/thumb-card card-enter-4.mp4`,
-  `${process.env.PUBLIC_URL}/gif/thumb-card card-enter-5.mp4`,
-  `${process.env.PUBLIC_URL}/gif/thumb-card card-enter-6.mp4`,
-  `${process.env.PUBLIC_URL}/gif/thumb-card card-enter-7.mp4`,
-  `${process.env.PUBLIC_URL}/gif/thumb-card card-enter-8.mp4`,
+  `${process.env.PUBLIC_URL}/gif/thumb-card-card-enter-0.mp4`,
+  `${process.env.PUBLIC_URL}/gif/thumb-card-card-enter-1.mp4`,
+  `${process.env.PUBLIC_URL}/gif/thumb-card-card-enter-2.mp4`,
+  `${process.env.PUBLIC_URL}/gif/thumb-card-card-enter-4.mp4`,
+  `${process.env.PUBLIC_URL}/gif/thumb-card-card-enter-5.mp4`,
+  `${process.env.PUBLIC_URL}/gif/thumb-card-card-enter-6.mp4`,
+  `${process.env.PUBLIC_URL}/gif/thumb-card-card-enter-7.mp4`,
+  `${process.env.PUBLIC_URL}/gif/thumb-card-card-enter-8.mp4`,
+];
+
+const PERSONAL_THUMB_VIDEOS = [
+  `${process.env.PUBLIC_URL}/gif/personal-project-1.mp4`,
+  `${process.env.PUBLIC_URL}/gif/personal-projecr-2.mp4`,
+];
+
+const FREELANCE_THUMB_VIDEOS = [
+  `${process.env.PUBLIC_URL}/gif/freelance-gif-1.mp4`,
+  `${process.env.PUBLIC_URL}/gif/freelance-gif-2.mp4`,
+  `${process.env.PUBLIC_URL}/gif/freelancer-gif-3.mp4`,
+  `${process.env.PUBLIC_URL}/gif/freelance-git-4.mp4`,
+  `${process.env.PUBLIC_URL}/gif/freelancer-gif-5.mp4`,
 ];
 
 const TABS = [
@@ -39,7 +89,11 @@ const TABS = [
   { key: "freelance", label: "Freelance" },
 ];
 
-function VideoThumb({ src }) {
+function VideoThumb({
+  src,
+  objectFit = "cover",
+  objectPosition = "center top",
+}) {
   const ref = useRef(null);
   const [loaded, setLoaded] = useState(false);
 
@@ -75,8 +129,8 @@ function VideoThumb({ src }) {
           inset: 0,
           width: "100%",
           height: "100%",
-          objectFit: "cover",
-          objectPosition: "center top",
+          objectFit,
+          objectPosition,
           opacity: loaded ? 1 : 0,
           transition: "opacity 0.5s ease",
           display: "block",
@@ -117,10 +171,54 @@ function ProjectFrame({ project, className }) {
   );
 }
 
+function getCardStyle(animState, index, pillPos) {
+  if (animState === "out") {
+    return {
+      transform: `
+        translate(
+          calc(${pillPos.x}px - 50%),
+          calc(${pillPos.y}px - 50%)
+        ) scale(0.05)
+      `,
+      opacity: 0,
+      filter: "blur(6px)",
+      transition: `
+        transform 1.2s cubic-bezier(0.55,0,1,0.45)
+          ${index * 0.06}s,
+        opacity 0.9s ease ${index * 0.05}s,
+        filter 0.9s ease
+      `,
+      pointerEvents: "none",
+      zIndex: 0,
+    };
+  }
+
+  if (animState === "in") {
+    return {
+      transform: "translate(0,0) scale(1)",
+      opacity: 1,
+      filter: "blur(0px)",
+      transition: `
+        transform ${1.2 + index * 0.07}s
+          cubic-bezier(0.16,1,0.3,1)
+          ${0.12 + index * 0.1}s,
+        opacity ${1.05 + index * 0.06}s ease
+          ${0.1 + index * 0.09}s,
+        filter ${1 + index * 0.05}s ease
+          ${0.1 + index * 0.09}s
+      `,
+      zIndex: 1,
+    };
+  }
+
+  return {};
+}
+
 export default function Projects() {
   const [activeTab, setActiveTab] = useState("client");
-  const [displayTab, setDisplayTab] = useState("client");
-  const [tabTransition, setTabTransition] = useState(false);
+  const [displayTab, setDisplayTab] = useState(activeTab);
+  const [animState, setAnimState] = useState("idle");
+  const [pillPos, setPillPos] = useState({ x: 0, y: 0 });
   const [pillStyle, setPillStyle] = useState({});
   const [pillTransitionEnabled, setPillTransitionEnabled] = useState(false);
   const [pillBouncing, setPillBouncing] = useState(false);
@@ -131,10 +229,15 @@ export default function Projects() {
   const [switchDir, setSwitchDir] = useState(null);
   const [switchStage, setSwitchStage] = useState("idle");
   const [switchingProject, setSwitchingProject] = useState(null);
+  const [incomingProject, setIncomingProject] = useState(null);
   const [pulseIndex, setPulseIndex] = useState(null);
+  const [isMobileView, setIsMobileView] = useState(
+    typeof window !== "undefined" ? window.innerWidth <= 768 : false,
+  );
 
-  const tabRefs = useRef({});
+  const tabBtnRefs = useRef({});
   const tabContainerRef = useRef(null);
+  const gridRef = useRef(null);
   const cardRefs = useRef([]);
   const pillRafRef = useRef(null);
   const bounceRafRef = useRef(null);
@@ -143,6 +246,12 @@ export default function Projects() {
 
   const currentProjects = PROJECTS[displayTab] || [];
   const currentProject = currentProjects[modalIndex] || null;
+
+  const thumbSrc = (tab, index) => {
+    if (tab === "personal") return PERSONAL_THUMB_VIDEOS[index];
+    if (tab === "freelance") return FREELANCE_THUMB_VIDEOS[index];
+    return THUMB_VIDEOS[index];
+  };
 
   const clearAllTimeouts = useCallback(() => {
     timeoutsRef.current.forEach((timeoutId) => clearTimeout(timeoutId));
@@ -168,7 +277,7 @@ export default function Projects() {
   const measurePill = useCallback(
     (disableTransition = false) => {
       const container = tabContainerRef.current;
-      const activeEl = tabRefs.current[activeTab];
+      const activeEl = tabBtnRefs.current[activeTab];
       if (!container || !activeEl) return;
 
       const cRect = container.getBoundingClientRect();
@@ -217,6 +326,7 @@ export default function Projects() {
       setSwitchDir(null);
       setSwitchStage("idle");
       setSwitchingProject(null);
+      setIncomingProject(null);
     },
     [clearAllTimeouts, queueTimeout],
   );
@@ -233,6 +343,7 @@ export default function Projects() {
       setSwitchDir(null);
       setSwitchStage("idle");
       setSwitchingProject(null);
+      setIncomingProject(null);
       setPulseIndex(null);
 
       queueTimeout(() => {
@@ -244,23 +355,35 @@ export default function Projects() {
     [clearAllTimeouts, modalOpen, queueTimeout],
   );
 
-  const runTabTransition = useCallback(
-    (tabKey) => {
-      clearAllTimeouts();
+  const handleTabClick = (newTab) => {
+    if (newTab === displayTab || animState !== "idle") return;
+
+    const btn = tabBtnRefs.current[newTab];
+    const grid = gridRef.current;
+    if (btn && grid) {
+      const br = btn.getBoundingClientRect();
+      const gr = grid.getBoundingClientRect();
+      setPillPos({
+        x: br.left + br.width / 2 - gr.left,
+        y: br.top + br.height / 2 - gr.top,
+      });
+    }
+
+    setActiveTab(newTab);
+    clearAllTimeouts();
+
+    setAnimState("out");
+
+    queueTimeout(() => {
+      setDisplayTab(newTab);
       setModalIndex(0);
-      setTabTransition(true);
+      setAnimState("in");
+    }, 1250);
 
-      queueTimeout(() => {
-        setDisplayTab(tabKey);
-        setActiveTab(tabKey);
-      }, 150);
-
-      queueTimeout(() => {
-        setTabTransition(false);
-      }, 165);
-    },
-    [clearAllTimeouts, queueTimeout],
-  );
+    queueTimeout(() => {
+      setAnimState("idle");
+    }, 3200);
+  };
 
   const switchProject = useCallback(
     (direction) => {
@@ -270,26 +393,34 @@ export default function Projects() {
       const nextIndex = modalIndex + delta;
       if (nextIndex < 0 || nextIndex >= currentProjects.length) return;
 
+      const nextProject = currentProjects[nextIndex];
+      if (!nextProject) return;
+
       clearAllTimeouts();
       setSwitchDir(direction);
-      setSwitchStage("out");
       setSwitchingProject(currentProject);
+      setIncomingProject(nextProject);
+      setSwitchStage("prepare");
+
+      queueTimeout(() => {
+        setSwitchStage("active");
+      }, 24);
 
       queueTimeout(() => {
         setModalIndex(nextIndex);
-        setSwitchStage("in");
-      }, 180);
+      }, 760);
 
       queueTimeout(() => {
         setSwitchDir(null);
         setSwitchStage("idle");
         setSwitchingProject(null);
-      }, 500);
+        setIncomingProject(null);
+      }, 860);
     },
     [
       clearAllTimeouts,
       currentProject,
-      currentProjects.length,
+      currentProjects,
       modalIndex,
       modalOpen,
       modalTransition,
@@ -299,18 +430,6 @@ export default function Projects() {
   );
 
   const openModal = handleCardClick;
-
-  const handleTabChange = useCallback(
-    (tabKey) => {
-      if (tabKey === activeTab) return;
-      if (modalOpen) {
-        closeModal(() => runTabTransition(tabKey));
-        return;
-      }
-      runTabTransition(tabKey);
-    },
-    [activeTab, closeModal, modalOpen, runTabTransition],
-  );
 
   useLayoutEffect(() => {
     measurePill(!pillTransitionEnabled);
@@ -367,6 +486,20 @@ export default function Projects() {
   }, [closeModal, modalOpen, switchProject]);
 
   useEffect(() => {
+    const media = window.matchMedia("(max-width: 768px)");
+    const apply = () => setIsMobileView(media.matches);
+    apply();
+
+    if (typeof media.addEventListener === "function") {
+      media.addEventListener("change", apply);
+      return () => media.removeEventListener("change", apply);
+    }
+
+    media.addListener(apply);
+    return () => media.removeListener(apply);
+  }, []);
+
+  useEffect(() => {
     return () => {
       clearAllTimeouts();
       cancelPillFrame();
@@ -374,7 +507,9 @@ export default function Projects() {
   }, [clearAllTimeouts]);
 
   return (
-    <section className="projects-page">
+    <section
+      className={`projects-page ${animState !== "idle" ? "is-animating" : ""}`}
+    >
       <div className="projects-tabs-shell">
         <div
           ref={tabContainerRef}
@@ -395,11 +530,11 @@ export default function Projects() {
             <button
               key={tab.key}
               ref={(el) => {
-                tabRefs.current[tab.key] = el;
+                tabBtnRefs.current[tab.key] = el;
               }}
               type="button"
               className={`projects-tab ${activeTab === tab.key ? "is-active" : ""}`}
-              onClick={() => handleTabChange(tab.key)}
+              onClick={() => handleTabClick(tab.key)}
             >
               {tab.label}
             </button>
@@ -408,23 +543,62 @@ export default function Projects() {
       </div>
 
       <div
-        className={`projects-grid-wrapper ${tabTransition ? "grid-transition-out" : ""} ${
-          modalOpen ? "grid-modal-active" : ""
-        } ${modalTransition === "closing" ? "grid-rack-reset" : ""}`}
+        className={`projects-grid-wrapper ${modalOpen ? "grid-modal-active" : ""} ${
+          modalTransition === "closing" ? "grid-rack-reset" : ""
+        }`}
       >
         <div className="grid-glow" aria-hidden="true" />
         {currentProjects.length > 0 ? (
-          <div key={displayTab} className="projects-grid grid-animating">
+          <div
+            key={displayTab}
+            ref={gridRef}
+            className={`projects-grid ${animState === "in" ? "throwing" : ""}`}
+          >
             {currentProjects.map((project, index) => (
               <div
                 key={project.id}
-                className={`project-card card-enter-${index}`}
-                style={{ animationDelay: `${index * 0.07}s` }}
-                onClick={() => openModal(index)}
+                className="project-card"
+                style={{
+                  "--px": `calc(${pillPos.x}px - 50%)`,
+                  "--py": `calc(${pillPos.y}px - 50%)`,
+                  "--dur": `${1.2 + index * 0.07}s`,
+                  "--del": `${0.12 + index * 0.1}s`,
+                  ...getCardStyle(animState, index, pillPos),
+                }}
+                onClick={() => animState === "idle" && openModal(index)}
               >
-                <VideoThumb src={THUMB_VIDEOS[index]} />
+                <VideoThumb
+                  src={thumbSrc(displayTab, index)}
+                  objectFit="cover"
+                  objectPosition={
+                    displayTab === "freelance" && (index === 3 || index === 4)
+                      ? "center center"
+                      : "center top"
+                  }
+                />
                 <div className="card-overlay">
                   <span className="card-play-icon">▶</span>
+                  {displayTab === "personal" && project.title && (
+                    <span
+                      style={{
+                        position: "absolute",
+                        bottom: "32px",
+                        left: "0",
+                        right: "0",
+                        textAlign: "center",
+                        font: "600 0.78rem Sora, sans-serif",
+                        color: "rgba(255,255,255,0.85)",
+                        letterSpacing: "0.06em",
+                        textTransform: "uppercase",
+                        textShadow: "0 2px 12px rgba(0,0,0,0.8)",
+                        zIndex: 4,
+                        padding: "0 8px",
+                        pointerEvents: "none",
+                      }}
+                    >
+                      {project.title}
+                    </span>
+                  )}
                 </div>
               </div>
             ))}
@@ -465,36 +639,6 @@ export default function Projects() {
             {"\u2715  Close"}
           </button>
 
-          <button
-            type="button"
-            className="modal-nav modal-nav-left"
-            onClick={() => switchProject("left")}
-            disabled={
-              modalIndex === 0 || modalTransition !== "open" || !!switchDir
-            }
-            aria-label="Previous project"
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M14.5 6.5 9 12l5.5 5.5" />
-            </svg>
-          </button>
-
-          <button
-            type="button"
-            className="modal-nav modal-nav-right"
-            onClick={() => switchProject("right")}
-            disabled={
-              modalIndex === currentProjects.length - 1 ||
-              modalTransition !== "open" ||
-              !!switchDir
-            }
-            aria-label="Next project"
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M9.5 6.5 15 12l-5.5 5.5" />
-            </svg>
-          </button>
-
           <div
             className={`projects-modal-content ${
               modalTransition === "open"
@@ -504,37 +648,125 @@ export default function Projects() {
                   : "modal-prime"
             }`}
           >
-            <div className="modal-video-shell">
-              {switchDir && switchingProject ? (
-                <>
+            {switchDir && switchingProject && incomingProject ? (
+              <div
+                style={{
+                  position: "relative",
+                  width:
+                    "min(380px, calc(100vw - 40px), calc((100dvh - 190px) * 9 / 16))",
+                  aspectRatio: "9 / 16",
+                }}
+              >
+                <div
+                  className="modal-video-shell"
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    transform:
+                      switchStage !== "active"
+                        ? "translateX(0%) scale(1)"
+                        : `translateX(${switchDir === "right" ? "-28%" : "28%"}) scale(0.975)`,
+                    opacity: switchStage !== "active" ? 1 : 0.22,
+                    transition:
+                      "transform 760ms cubic-bezier(0.22, 1, 0.36, 1), opacity 700ms ease",
+                    willChange: "transform, opacity",
+                  }}
+                >
                   <ProjectFrame
                     project={switchingProject}
-                    className={`modal-frame-layer is-out is-active ${
-                      switchDir === "right"
-                        ? "dissolve-out-left"
-                        : "dissolve-out-right"
+                    className="modal-frame-layer is-static"
+                  />
+                </div>
+
+                <div
+                  className="modal-video-shell"
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    transform:
+                      switchStage !== "active"
+                        ? `translateX(${switchDir === "right" ? "28%" : "-28%"}) scale(0.975)`
+                        : "translateX(0%) scale(1)",
+                    opacity: switchStage !== "active" ? 0.18 : 1,
+                    transition:
+                      "transform 760ms cubic-bezier(0.16, 1, 0.3, 1), opacity 720ms ease",
+                    willChange: "transform, opacity",
+                  }}
+                >
+                  <ProjectFrame
+                    project={incomingProject}
+                    className={`modal-frame-layer is-static ${
+                      modalTransition === "open" ? "modal-bloom" : ""
                     }`}
                   />
-                  {switchStage === "in" && (
-                    <ProjectFrame
-                      project={currentProject}
-                      className={`modal-frame-layer is-in is-active ${
-                        switchDir === "right"
-                          ? "dissolve-in-right"
-                          : "dissolve-in-left"
-                      }`}
-                    />
-                  )}
-                </>
-              ) : (
+                </div>
+              </div>
+            ) : (
+              <div
+                className="modal-video-shell"
+                style={{
+                  width:
+                    "min(380px, calc(100vw - 40px), calc((100dvh - 190px) * 9 / 16))",
+                }}
+              >
                 <ProjectFrame
                   project={currentProject}
                   className={`modal-frame-layer is-static ${
                     modalTransition === "open" ? "modal-bloom" : ""
                   }`}
                 />
-              )}
-            </div>
+              </div>
+            )}
+
+            <button
+              type="button"
+              className="modal-nav"
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: isMobileView
+                  ? "clamp(-18px, -6vw, -10px)"
+                  : "clamp(-52px, -8vw, -34px)",
+                transform: "translateY(-50%)",
+                pointerEvents: "auto",
+                zIndex: 220,
+              }}
+              onClick={() => switchProject("left")}
+              disabled={
+                modalIndex === 0 || modalTransition !== "open" || !!switchDir
+              }
+              aria-label="Previous project"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M14.5 6.5 9 12l5.5 5.5" />
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              className="modal-nav"
+              style={{
+                position: "absolute",
+                top: "50%",
+                right: isMobileView
+                  ? "clamp(-18px, -6vw, -10px)"
+                  : "clamp(-52px, -8vw, -34px)",
+                transform: "translateY(-50%)",
+                pointerEvents: "auto",
+                zIndex: 220,
+              }}
+              onClick={() => switchProject("right")}
+              disabled={
+                modalIndex === currentProjects.length - 1 ||
+                modalTransition !== "open" ||
+                !!switchDir
+              }
+              aria-label="Next project"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M9.5 6.5 15 12l-5.5 5.5" />
+              </svg>
+            </button>
           </div>
 
           <div className="modal-meta">

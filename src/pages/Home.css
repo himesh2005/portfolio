@@ -522,6 +522,8 @@
     display: flex;
     flex-direction: column;
     gap: 22px;
+    position: relative;
+    z-index: 4;
 }
 
 .social-section-below-fold {
@@ -560,9 +562,9 @@
     transform: translateY(18px) scale(0.98);
     filter: blur(8px);
     transition:
-        opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1),
-        transform 1.1s cubic-bezier(0.16, 1, 0.3, 1),
-        filter 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+        opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 1s cubic-bezier(0.16, 1, 0.3, 1),
+        filter 1s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: transform, opacity, filter;
 }
 .social-card.card-visible {
@@ -608,6 +610,8 @@
     align-items: center;
     justify-content: space-between;
     padding: 14px 16px 10px;
+    position: relative;
+    z-index: 3;
 }
 .social-handle-row {
     display: flex;
@@ -633,6 +637,9 @@
     color: rgba(240, 240, 255, 0.4);
     transition: all 0.2s ease;
     white-space: nowrap;
+    position: relative;
+    z-index: 4;
+    pointer-events: auto;
 }
 .social-pill-btn:hover {
     color: #f0f0ff;
@@ -647,6 +654,8 @@
 /* Behold wrapper */
 .behold-wrapper {
     padding: 0 6px 10px;
+    position: relative;
+    z-index: 1;
 }
 .behold-wrapper behold-widget {
     --behold-background: transparent;

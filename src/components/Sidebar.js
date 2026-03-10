@@ -73,47 +73,14 @@ function LogoMark({ logoRef }) {
     <div className="logo-mark" ref={logoRef} aria-hidden="true">
       <span className="logo-ac">AC</span>
       <span className="logo-app app-cc">
-        <svg
-          viewBox="0 0 100 100"
-          width="13"
-          height="13"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <rect
-            x="18"
-            y="12"
-            width="44"
-            height="32"
-            rx="10"
-            ry="10"
-            fill="none"
-            stroke="#111"
-            strokeWidth="10"
-            strokeLinecap="round"
-          />
-          <rect
-            x="38"
-            y="56"
-            width="44"
-            height="32"
-            rx="10"
-            ry="10"
-            fill="none"
-            stroke="#111"
-            strokeWidth="10"
-            strokeLinecap="round"
-          />
-          <line
-            x1="22"
-            y1="78"
-            x2="78"
-            y2="22"
-            stroke="#111"
-            strokeWidth="9"
-            strokeLinecap="round"
-          />
-        </svg>
+        <img
+          src="/image/download__1_-removebg-preview.png"
+          alt="CapCut"
+          width="14"
+          height="14"
+          loading="lazy"
+          decoding="async"
+        />
       </span>
       <span className="logo-app app-pr">Pr</span>
       <span className="logo-app app-ae">Ae</span>

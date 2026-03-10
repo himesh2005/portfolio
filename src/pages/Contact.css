@@ -1,153 +1,632 @@
 .contact-page {
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
+    margin-left: 0;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(40px, 6vh, 80px) clamp(24px, 5vw, 80px);
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
 }
 
-.contact-content {
-  max-width: 900px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 100px 60px;
+.contact-orb {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
 }
 
-.contact-head {
-  text-align: center;
+.orb-a {
+    width: 500px;
+    height: 500px;
+    top: -100px;
+    right: -80px;
+    background: radial-gradient(
+        circle,
+        rgba(247, 37, 133, 0.12) 0%,
+        transparent 70%
+    );
+    animation: orb-float-a 14s ease-in-out infinite;
 }
 
-.contact-head h2 {
-  font-size: clamp(40px, 6vw, 72px);
-  line-height: 0.95;
-  font-weight: 800;
+.orb-b {
+    width: 400px;
+    height: 400px;
+    bottom: -60px;
+    left: 5%;
+    background: radial-gradient(
+        circle,
+        rgba(67, 97, 238, 0.1) 0%,
+        transparent 70%
+    );
+    animation: orb-float-b 18s ease-in-out infinite;
 }
 
-.contact-head h2 span {
-  display: block;
-  background: linear-gradient(120deg, var(--pink), var(--blue));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.availability {
-  margin-top: 10px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.8rem;
-  color: var(--muted);
-  font-weight: 400;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #22c55e;
-  animation: dotBlink 1.15s ease-in-out infinite;
+.orb-c {
+    width: 300px;
+    height: 300px;
+    top: 40%;
+    left: 30%;
+    background: radial-gradient(
+        circle,
+        rgba(123, 94, 167, 0.08) 0%,
+        transparent 70%
+    );
+    animation: orb-float-c 22s ease-in-out infinite;
 }
 
 .contact-grid {
-  margin-top: 40px;
-  display: grid;
-  grid-template-columns: 1fr 1.1fr;
-  gap: 60px;
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: clamp(40px, 6vw, 100px);
+    width: 100%;
+    max-width: 1000px;
+    position: relative;
+    z-index: 1;
 }
 
-.mail-link {
-  font-size: 1.02rem;
-  font-weight: 500;
-  transition: color 0.25s ease;
+.contact-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
 }
 
-.mail-link:hover {
-  background: linear-gradient(120deg, var(--pink), var(--blue));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+.contact-headline {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    line-height: 1.05;
 }
 
-.social-links {
-  margin-top: 16px;
-  display: grid;
-  gap: 8px;
+.headline-word {
+    font-family: "Sora", sans-serif;
+    font-weight: 800;
+    font-size: clamp(2rem, 4.5vw, 3.2rem);
+    color: rgba(240, 240, 255, 0.95);
+    letter-spacing: -0.04em;
+    animation: blur-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.social-links a {
-  color: var(--muted);
-  font-size: 0.84rem;
-  transition: color 0.2s ease;
+.delay-1 {
+    animation-delay: 0.1s;
 }
 
-.social-links a:hover {
-  color: var(--white);
+.delay-2 {
+    animation-delay: 0.2s;
+}
+
+.delay-3 {
+    animation-delay: 0.3s;
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, #f72585, #7b5ea7, #4361ee);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation:
+        blur-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both,
+        gradient-shift 4s ease infinite;
+}
+
+.availability-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: -8px;
+    animation: blur-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.38s both;
+}
+
+.status-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #22c55e;
+    animation: blink 2s ease infinite;
+}
+
+.availability-badge span:last-child {
+    font-family: "Sora", sans-serif;
+    font-weight: 300;
+    font-size: 0.75rem;
+    color: rgba(240, 240, 255, 0.4);
+}
+
+.contact-email-line {
+    margin: 0;
+    text-align: center;
+    font:
+        400 0.82rem "Sora",
+        sans-serif;
+    color: rgba(240, 240, 255, 0.35);
+    letter-spacing: 0.04em;
+    animation: blur-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.44s both;
+}
+
+.social-list {
+    width: min(100%, 430px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.contact-page .social-list .social-item {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 12px;
+    text-decoration: none;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0);
+    transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+    animation: blur-reveal 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.contact-page .social-list .social-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.07);
+    transform: translateX(6px);
+}
+
+.social-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.contact-page .social-list .social-copy {
+    min-width: 0;
+    justify-self: start;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    text-align: left;
+}
+
+.contact-page .social-list .social-label {
+    font-family: "Sora", sans-serif;
+    font-weight: 500;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-align: left;
+    color: rgba(240, 240, 255, 0.7);
+}
+
+.contact-page .social-list .social-handle {
+    font-family: "Sora", sans-serif;
+    font-weight: 300;
+    font-size: 0.68rem;
+    line-height: 1.25;
+    text-align: left;
+    color: rgba(240, 240, 255, 0.3);
+}
+
+.contact-page .social-list .social-arrow {
+    justify-self: end;
+    font-size: 0.7rem;
+    color: rgba(240, 240, 255, 0.2);
+    transition:
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.contact-page .social-list .social-item:hover .social-arrow {
+    color: #ffffff;
+    transform: translateX(2px) translateY(-2px);
+}
+
+.contact-form-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 24px;
+    padding: clamp(24px, 4vw, 40px);
+    position: relative;
+    overflow: hidden;
+    animation: blur-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+
+.card-top-shimmer {
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(247, 37, 133, 0.5),
+        rgba(67, 97, 238, 0.5),
+        transparent
+    );
 }
 
 .contact-form {
-  display: grid;
-  gap: 8px;
+    position: relative;
+    z-index: 1;
 }
 
-.contact-form label {
-  margin-top: 6px;
-  font-size: 0.72rem;
-  color: var(--muted);
+.field-group {
+    position: relative;
+    margin-bottom: 16px;
 }
 
-.contact-form input,
-.contact-form textarea {
-  width: 100%;
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--border);
-  padding: 12px 0;
-  color: var(--white);
-  outline: none;
+.field-group label {
+    font:
+        300 0.65rem "Sora",
+        sans-serif;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(240, 240, 255, 0.3);
+    display: block;
+    margin-bottom: 6px;
+    transition: color 0.2s ease;
 }
 
-.contact-form input:focus,
-.contact-form textarea:focus {
-  border-bottom-color: var(--blue);
-  box-shadow: 0 10px 24px -18px var(--blue);
+.field-group label.active,
+.field-group:focus-within label {
+    color: rgba(240, 240, 255, 0.7);
 }
 
-.contact-form button {
-  margin-top: 14px;
-  width: 100%;
-  border: none;
-  border-radius: 100px;
-  padding: 16px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #fff;
-  background: linear-gradient(120deg, var(--pink), var(--blue));
-  transition: transform 0.25s ease, opacity 0.25s ease;
+.field-accent {
+    position: absolute;
+    left: 0;
+    top: 32px;
+    bottom: 0;
+    width: 2px;
+    border-radius: 0 2px 2px 0;
+    background: linear-gradient(to bottom, #f72585, #4361ee);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.contact-form button:hover {
-  opacity: 0.9;
-  transform: translateY(-2px);
+.field-accent.on {
+    transform: scaleY(1);
 }
 
-@keyframes dotBlink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.32; }
+.field-group input,
+.field-group textarea {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    padding: 13px 16px;
+    font:
+        400 0.85rem "Sora",
+        sans-serif;
+    color: rgba(240, 240, 255, 0.85);
+    outline: none;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
+    caret-color: #f72585;
+}
+
+.field-group input::placeholder,
+.field-group textarea::placeholder {
+    color: rgba(240, 240, 255, 0.2);
+}
+
+.field-group input:focus,
+.field-group textarea:focus {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(247, 37, 133, 0.3);
+    box-shadow:
+        0 0 0 3px rgba(247, 37, 133, 0.06),
+        0 4px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+}
+
+.field-group textarea {
+    height: 110px;
+    resize: none;
+    line-height: 1.6;
+}
+
+.char-count {
+    text-align: right;
+    font:
+        300 0.6rem "Sora",
+        sans-serif;
+    color: rgba(240, 240, 255, 0.2);
+    margin-top: 4px;
+}
+
+.char-count.warn {
+    color: #f72585;
+}
+
+.send-btn {
+    width: 100%;
+    padding: 16px;
+    margin-top: 8px;
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    font:
+        600 0.88rem "Sora",
+        sans-serif;
+    letter-spacing: 0.06em;
+    color: #ffffff;
+    background: linear-gradient(135deg, #f72585 0%, #7b5ea7 50%, #4361ee 100%);
+    background-size: 200% 200%;
+    animation: btn-gradient 4s ease infinite;
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    will-change: transform;
+}
+
+.send-btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        105deg,
+        transparent 40%,
+        rgba(255, 255, 255, 0.15) 50%,
+        transparent 60%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 3s ease infinite;
+}
+
+.send-btn:hover:not(:disabled) {
+    box-shadow: 0 12px 40px rgba(247, 37, 133, 0.35);
+}
+
+.send-btn:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+.send-btn.sent {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    animation: none;
+}
+
+.btn-row {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.send-btn > span,
+.send-btn > .btn-row {
+    position: relative;
+    z-index: 1;
+}
+
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+.error-note {
+    margin-top: 10px;
+    color: rgba(255, 80, 80, 0.8);
+    font:
+        300 0.72rem "Sora",
+        sans-serif;
+}
+
+.error-note a {
+    color: rgba(255, 110, 110, 0.95);
+    text-decoration: underline;
+}
+
+.success-state {
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    text-align: center;
+}
+
+.success-check {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    color: #22c55e;
+    animation: pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.success-state h3 {
+    margin: 0;
+    font:
+        700 1.1rem "Sora",
+        sans-serif;
+    color: rgba(240, 240, 255, 0.9);
+}
+
+.success-state p {
+    margin: 0;
+    font:
+        300 0.8rem "Sora",
+        sans-serif;
+    color: rgba(240, 240, 255, 0.4);
+}
+
+.send-another-btn {
+    margin-top: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(240, 240, 255, 0.78);
+    border-radius: 999px;
+    padding: 10px 16px;
+    font:
+        500 0.72rem "Sora",
+        sans-serif;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.send-another-btn:hover {
+    border-color: rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.07);
+}
+
+@keyframes orb-float-a {
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+    50% {
+        transform: translate(-30px, 20px) scale(1.1);
+    }
+}
+
+@keyframes orb-float-b {
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+    50% {
+        transform: translate(20px, -25px) scale(1.08);
+    }
+}
+
+@keyframes orb-float-c {
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+    50% {
+        transform: translate(-15px, 15px);
+    }
+}
+
+@keyframes gradient-shift {
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+@keyframes blink {
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.4;
+        transform: scale(0.8);
+    }
+}
+
+@keyframes blur-reveal {
+    0% {
+        opacity: 0;
+        transform: translateY(16px);
+        filter: blur(12px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+
+@keyframes btn-gradient {
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pop-in {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 @media (max-width: 768px) {
-  .contact-page {
-    height: calc(100vh - 60px);
-    align-items: flex-start;
-    overflow-y: auto;
-  }
+    .contact-page {
+        margin-left: 0;
+        width: 100vw;
+        padding: 80px 20px 60px;
+        justify-content: flex-start;
+    }
 
-  .contact-content {
-    padding: 28px 24px 80px;
-  }
+    .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
 
-  .contact-grid {
-    grid-template-columns: 1fr;
-    gap: 30px;
-  }
+    .headline-word {
+        font-size: clamp(1.8rem, 8vw, 2.6rem);
+    }
+
+    .social-list {
+        gap: 8px;
+    }
+
+    .social-item {
+        padding: 8px 12px;
+    }
+
+    .contact-form-card {
+        padding: 20px 18px;
+        border-radius: 18px;
+    }
 }

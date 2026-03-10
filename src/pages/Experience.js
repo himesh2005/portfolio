@@ -314,7 +314,7 @@ export default function Experience() {
               </g>
             ))}
 
-            <circle r="3" opacity="0.7" fill="#6c83f0" filter="url(#glow)">
+            <circle r="3" opacity="0" fill="#6c83f0" filter="url(#glow)">
               <animateMotion
                 path={path0D}
                 dur="10s"
@@ -333,7 +333,7 @@ export default function Experience() {
                 repeatCount="indefinite"
               />
             </circle>
-            <circle r="7" opacity="0.18" fill="#4361ee" filter="url(#glow)">
+            <circle r="7" opacity="0" fill="#4361ee" filter="url(#glow)">
               <animateMotion
                 path={path0D}
                 dur="10s"
@@ -353,7 +353,7 @@ export default function Experience() {
               />
             </circle>
 
-            <circle r="3" opacity="0.7" fill="#fa5eab" filter="url(#glow)">
+            <circle r="3" opacity="0" fill="#fa5eab" filter="url(#glow)">
               <animateMotion
                 path={path1D}
                 dur="12s"
@@ -372,7 +372,7 @@ export default function Experience() {
                 repeatCount="indefinite"
               />
             </circle>
-            <circle r="7" opacity="0.18" fill="#f72585" filter="url(#glow)">
+            <circle r="7" opacity="0" fill="#f72585" filter="url(#glow)">
               <animateMotion
                 path={path1D}
                 dur="12s"

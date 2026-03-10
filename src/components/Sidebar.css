@@ -84,15 +84,16 @@
     width: 22px;
     height: 22px;
     border-radius: 6px;
-    font-size: 0.44rem;
     left: -10px;
     top: -8px;
     background: #d4d4d4;
-    color: #111;
     animation: micro-float-c 10s ease-in-out infinite;
 }
 
-.app-cc svg {
+.app-cc img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
     display: block;
 }
 
@@ -162,10 +163,13 @@
 }
 
 .availability {
-    margin-top: auto;
-    display: inline-flex;
+    margin-top: 10px;
+    width: 100%;
+    display: flex;
     align-items: center;
+    justify-content: flex-start;
     gap: 0.45rem;
+    padding: 10px 12px;
     color: var(--muted);
     font-size: 0.7rem;
     font-weight: 300;

@@ -77,6 +77,7 @@ export default function Home({ onNavigate }) {
   const sectionRef = useRef(null);
   const igRef = useRef(null);
   const [socVisible, setSocVisible] = useState(false);
+  const socialRevealTimeoutRef = useRef(null);
 
   useEffect(() => {
     if (igRef.current) {
@@ -86,14 +87,40 @@ export default function Home({ onNavigate }) {
   }, []);
 
   useEffect(() => {
+    const TOOLS_INTRO_TOTAL_MS = 1000;
+    const introStartTime = performance.now();
+
+    const scheduleSocialReveal = () => {
+      const elapsed = performance.now() - introStartTime;
+      const remaining = Math.max(0, TOOLS_INTRO_TOTAL_MS - elapsed);
+
+      if (socialRevealTimeoutRef.current) {
+        clearTimeout(socialRevealTimeoutRef.current);
+      }
+
+      socialRevealTimeoutRef.current = setTimeout(() => {
+        setSocVisible(true);
+      }, remaining);
+    };
+
     const obs = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) setSocVisible(true);
+        if (!entry.isIntersecting) return;
+        scheduleSocialReveal();
+        obs.disconnect();
       },
       { threshold: 0.08 },
     );
+
     if (sectionRef.current) obs.observe(sectionRef.current);
-    return () => obs.disconnect();
+
+    return () => {
+      obs.disconnect();
+      if (socialRevealTimeoutRef.current) {
+        clearTimeout(socialRevealTimeoutRef.current);
+        socialRevealTimeoutRef.current = null;
+      }
+    };
   }, []);
 
   return (
@@ -223,7 +250,7 @@ export default function Home({ onNavigate }) {
                 <span className="social-handle">@abhi.keyf</span>
               </div>
               <a
-                href="https://www.instagram.com/abhi.keyf"
+                href="https://www.instagram.com/abhi.keyf?igsh=OHpkaHdieGJwdWtt"
                 target="_blank"
                 rel="noreferrer"
                 className="social-pill-btn ig-btn"
