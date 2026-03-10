@@ -16,11 +16,22 @@ const PROJECTS = {
     { id: 5, driveId: "1xebUY4lRZGq-R4EfRlMcGNd8KY-SnHhE" },
     { id: 6, driveId: "1KC_0YOuKaEZoAeZPmdNKPV7JC28pJIce" },
     { id: 7, driveId: "1_8tsLwTUPPjwcJEYtpuMjPbH0GOlOsZX" },
-    { id: 8, driveId: "1aBefknyW5kPAkexZs5-3JsS2o3XJ8BY0" },
+    { id: 8, driveId: "1CdmJQo2rkIx1YRf0q9W-iTnVRoTWDXB2" },
   ],
   personal: [],
   freelance: [],
 };
+
+const THUMB_VIDEOS = [
+  `${process.env.PUBLIC_URL}/gif/thumb-card card-enter-0.mp4`,
+  `${process.env.PUBLIC_URL}/gif/thumb-card card-enter-1.mp4`,
+  `${process.env.PUBLIC_URL}/gif/thumb-card card-enter-2.mp4`,
+  `${process.env.PUBLIC_URL}/gif/thumb-card card-enter-4.mp4`,
+  `${process.env.PUBLIC_URL}/gif/thumb-card card-enter-5.mp4`,
+  `${process.env.PUBLIC_URL}/gif/thumb-card card-enter-6.mp4`,
+  `${process.env.PUBLIC_URL}/gif/thumb-card card-enter-7.mp4`,
+  `${process.env.PUBLIC_URL}/gif/thumb-card card-enter-8.mp4`,
+];
 
 const TABS = [
   { key: "client", label: "Client Work" },
@@ -28,22 +39,63 @@ const TABS = [
   { key: "freelance", label: "Freelance" },
 ];
 
-function ThumbVisual() {
+function VideoThumb({ src }) {
+  const ref = useRef(null);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.load();
+    const onReady = () => {
+      setLoaded(true);
+      el.play().catch(() => {});
+    };
+    el.addEventListener("canplaythrough", onReady);
+    return () => el.removeEventListener("canplaythrough", onReady);
+  }, [src]);
+
   return (
-    <div className="thumb-visual">
-      <div className="thumb-dots" aria-hidden="true">
-        <span className="dot dot-rec" />
-        <span className="dot dot-blue" />
-      </div>
-      <div className="thumb-center" aria-hidden="true">
-        <span className="thumb-rule" />
-        <span className="thumb-client">CLIENT</span>
-        <span className="thumb-work">WORK</span>
-        <span className="thumb-rule" />
-      </div>
-      <span className="thumb-play" aria-hidden="true">
-        {"\u25B6  PLAY"}
-      </span>
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        background: "#09091d",
+      }}
+    >
+      <video
+        ref={ref}
+        src={src}
+        muted
+        loop
+        playsInline
+        preload="auto"
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          objectPosition: "center top",
+          opacity: loaded ? 1 : 0,
+          transition: "opacity 0.5s ease",
+          display: "block",
+        }}
+      />
+      {!loaded && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "linear-gradient(160deg,#0e0e22,#0a0a1a)",
+          }}
+        >
+          <div className="vid-spinner" />
+        </div>
+      )}
     </div>
   );
 }
@@ -246,6 +298,8 @@ export default function Projects() {
     ],
   );
 
+  const openModal = handleCardClick;
+
   const handleTabChange = useCallback(
     (tabKey) => {
       if (tabKey === activeTab) return;
@@ -361,46 +415,19 @@ export default function Projects() {
         <div className="grid-glow" aria-hidden="true" />
         {currentProjects.length > 0 ? (
           <div key={displayTab} className="projects-grid grid-animating">
-            {currentProjects.map((project, index) => {
-              const isActive = modalOpen && index === modalIndex;
-              const isPulsing = pulseIndex === index;
-              return (
-                <button
-                  key={project.id}
-                  ref={(el) => {
-                    cardRefs.current[index] = el;
-                  }}
-                  type="button"
-                  className={`thumb-card card-enter-${index % 8} ${isActive ? "is-active" : ""} ${
-                    isPulsing ? "is-pulsing" : ""
-                  }`}
-                  style={{
-                    "--card-delay":
-                      index % 8 === 0
-                        ? "0ms"
-                        : index % 8 === 1
-                          ? "80ms"
-                          : index % 8 === 2
-                            ? "160ms"
-                            : index % 8 === 3
-                              ? "240ms"
-                              : index % 8 === 4
-                                ? "140ms"
-                                : index % 8 === 5
-                                  ? "220ms"
-                                  : index % 8 === 6
-                                    ? "300ms"
-                                    : "380ms",
-                  }}
-                  onClick={() => handleCardClick(index)}
-                >
-                  <ThumbVisual />
-                  {isActive && (
-                    <span className="thumb-top-accent" aria-hidden="true" />
-                  )}
-                </button>
-              );
-            })}
+            {currentProjects.map((project, index) => (
+              <div
+                key={project.id}
+                className={`project-card card-enter-${index}`}
+                style={{ animationDelay: `${index * 0.07}s` }}
+                onClick={() => openModal(index)}
+              >
+                <VideoThumb src={THUMB_VIDEOS[index]} />
+                <div className="card-overlay">
+                  <span className="card-play-icon">▶</span>
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="projects-empty" aria-live="polite">
