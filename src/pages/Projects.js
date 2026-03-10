@@ -652,8 +652,7 @@ export default function Projects() {
               <div
                 style={{
                   position: "relative",
-                  width:
-                    "min(380px, calc(100vw - 40px), calc((100dvh - 190px) * 9 / 16))",
+                  width: "min(380px, calc(100vw - 32px))",
                   aspectRatio: "9 / 16",
                 }}
               >
@@ -664,11 +663,11 @@ export default function Projects() {
                     inset: 0,
                     transform:
                       switchStage !== "active"
-                        ? "translateX(0%) scale(1)"
-                        : `translateX(${switchDir === "right" ? "-28%" : "28%"}) scale(0.975)`,
-                    opacity: switchStage !== "active" ? 1 : 0.22,
+                        ? "translateX(0%)"
+                        : `translateX(${switchDir === "right" ? "-24%" : "24%"})`,
+                    opacity: switchStage !== "active" ? 1 : 0,
                     transition:
-                      "transform 760ms cubic-bezier(0.22, 1, 0.36, 1), opacity 700ms ease",
+                      "transform 760ms cubic-bezier(0.22, 1, 0.36, 1), opacity 760ms ease",
                     willChange: "transform, opacity",
                   }}
                 >
@@ -685,11 +684,11 @@ export default function Projects() {
                     inset: 0,
                     transform:
                       switchStage !== "active"
-                        ? `translateX(${switchDir === "right" ? "28%" : "-28%"}) scale(0.975)`
-                        : "translateX(0%) scale(1)",
-                    opacity: switchStage !== "active" ? 0.18 : 1,
+                        ? `translateX(${switchDir === "right" ? "24%" : "-24%"})`
+                        : "translateX(0%)",
+                    opacity: switchStage !== "active" ? 0 : 1,
                     transition:
-                      "transform 760ms cubic-bezier(0.16, 1, 0.3, 1), opacity 720ms ease",
+                      "transform 760ms cubic-bezier(0.16, 1, 0.3, 1), opacity 760ms ease",
                     willChange: "transform, opacity",
                   }}
                 >
@@ -705,8 +704,7 @@ export default function Projects() {
               <div
                 className="modal-video-shell"
                 style={{
-                  width:
-                    "min(380px, calc(100vw - 40px), calc((100dvh - 190px) * 9 / 16))",
+                  width: "min(380px, calc(100vw - 32px))",
                 }}
               >
                 <ProjectFrame

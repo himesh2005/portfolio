@@ -355,6 +355,10 @@
         transform: scale(0.6);
         background: rgba(255, 255, 255, 0.12);
     }
+
+    .card-play-icon {
+        display: none;
+    }
 }
 
 .thumb-visual {
@@ -592,7 +596,7 @@
     --modal-shell-width: min(380px, calc(100vw - 120px));
     width: min(var(--modal-shell-width), calc(100vw - 32px));
     aspect-ratio: 9 / 16;
-    max-height: min(78vh, calc(100dvh - 180px));
+    max-height: min(78vh, calc(100svh - 180px));
     border-radius: 20px;
     overflow: hidden;
     background: #000;
@@ -994,7 +998,7 @@
 
     .modal-video-shell {
         width: var(--modal-shell-width);
-        max-height: min(74vh, calc(100dvh - 210px));
+        max-height: min(74vh, calc(100svh - 210px));
     }
 
     .modal-nav {
@@ -1065,7 +1069,7 @@
 
     .modal-video-shell {
         width: var(--modal-shell-width);
-        max-height: min(72vh, calc(100dvh - 200px));
+        max-height: min(72vh, calc(100svh - 200px));
         border-radius: 16px;
     }
 
