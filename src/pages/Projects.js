@@ -90,11 +90,7 @@ const TABS = [
   { key: "freelance", label: "Freelance" },
 ];
 
-function VideoThumb({
-  src,
-  objectFit = "cover",
-  objectPosition = "center top",
-}) {
+function VideoThumb({ src, index, isActive }) {
   const ref = useRef(null);
   const [loaded, setLoaded] = useState(false);
 
@@ -102,13 +98,20 @@ function VideoThumb({
     const el = ref.current;
     if (!el) return;
     el.load();
-    const onReady = () => {
-      setLoaded(true);
-      el.play().catch(() => {});
-    };
+    const onReady = () => setLoaded(true);
     el.addEventListener("canplaythrough", onReady);
     return () => el.removeEventListener("canplaythrough", onReady);
-  }, [src]);
+  }, []);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !loaded) return;
+    if (isActive) {
+      el.play().catch(() => {});
+    } else {
+      el.pause();
+    }
+  }, [isActive, loaded]);
 
   return (
     <div
@@ -130,8 +133,8 @@ function VideoThumb({
           inset: 0,
           width: "100%",
           height: "100%",
-          objectFit,
-          objectPosition,
+          objectFit: "cover",
+          objectPosition: "center top",
           opacity: loaded ? 1 : 0,
           transition: "opacity 0.5s ease",
           display: "block",
@@ -546,46 +549,54 @@ export default function Projects() {
       <div
         className={`projects-grid-wrapper ${modalOpen ? "grid-modal-active" : ""} ${
           modalTransition === "closing" ? "grid-rack-reset" : ""
-        }`}
+        } ${animState !== "idle" ? "is-animating" : ""}`}
+        ref={gridRef}
       >
         <div className="grid-glow" aria-hidden="true" />
-        {currentProjects.length > 0 ? (
+        {["client", "personal", "freelance"].map((tab) => (
           <div
-            key={displayTab}
-            ref={gridRef}
-            className={`projects-grid ${animState === "in" ? "throwing" : ""}`}
+            key={tab}
+            className={`projects-grid ${
+              animState === "in" && displayTab === tab ? "throwing" : ""
+            }`}
+            style={{
+              display: displayTab === tab ? "grid" : "none",
+              "--pill-x": `calc(${pillPos.x}px - 50%)`,
+              "--pill-y": `calc(${pillPos.y}px - 50%)`,
+            }}
           >
-            {currentProjects.map((project, index) => (
+            {PROJECTS[tab].map((project, index) => (
               <div
                 key={project.id}
-                className="project-card"
+                className={`project-card ${
+                  animState === "in" && displayTab === tab ? "throwing" : ""
+                }`}
                 style={{
-                  "--px": `calc(${pillPos.x}px - 50%)`,
-                  "--py": `calc(${pillPos.y}px - 50%)`,
-                  "--dur": `${0.72 + index * 0.045}s`,
-                  "--del": `${0.04 + index * 0.05}s`,
-                  ...getCardStyle(animState, index, pillPos),
+                  "--dur": `${0.55 + index * 0.04}s`,
+                  "--del": `${index * 0.07}s`,
+                  ...getCardStyle(
+                    displayTab === tab ? animState : "idle",
+                    index,
+                    pillPos,
+                  ),
                 }}
                 onClick={() => animState === "idle" && openModal(index)}
               >
                 <VideoThumb
-                  src={thumbSrc(displayTab, index)}
-                  objectFit="cover"
-                  objectPosition={
-                    displayTab === "freelance" && (index === 3 || index === 4)
-                      ? "center center"
-                      : "center top"
-                  }
+                  src={thumbSrc(tab, index)}
+                  index={index}
+                  isActive={displayTab === tab}
                 />
                 <div className="card-overlay">
                   <span className="card-play-icon">▶</span>
-                  {displayTab === "personal" && project.title && (
+
+                  {tab === "personal" && project.title && (
                     <span
                       style={{
                         position: "absolute",
                         bottom: "32px",
-                        left: "0",
-                        right: "0",
+                        left: 0,
+                        right: 0,
                         textAlign: "center",
                         font: "600 0.78rem Sora, sans-serif",
                         color: "rgba(255,255,255,0.85)",
@@ -604,14 +615,7 @@ export default function Projects() {
               </div>
             ))}
           </div>
-        ) : (
-          <div className="projects-empty" aria-live="polite">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM17.5 14v2.5H20V19h-2.5v2.5H15V19h-2.5v-2.5H15V14z" />
-            </svg>
-            <p>Projects coming soon</p>
-          </div>
-        )}
+        ))}
       </div>
 
       {modalOpen &&
