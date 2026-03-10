@@ -5,6 +5,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 import "./Projects.css";
 
 const PROJECTS = {
@@ -183,10 +184,10 @@ function getCardStyle(animState, index, pillPos) {
       opacity: 0,
       filter: "blur(6px)",
       transition: `
-        transform 1.2s cubic-bezier(0.55,0,1,0.45)
-          ${index * 0.06}s,
-        opacity 0.9s ease ${index * 0.05}s,
-        filter 0.9s ease
+        transform 0.75s cubic-bezier(0.55,0,1,0.45)
+          ${index * 0.035}s,
+        opacity 0.55s ease ${index * 0.03}s,
+        filter 0.55s ease
       `,
       pointerEvents: "none",
       zIndex: 0,
@@ -199,13 +200,13 @@ function getCardStyle(animState, index, pillPos) {
       opacity: 1,
       filter: "blur(0px)",
       transition: `
-        transform ${1.2 + index * 0.07}s
+        transform ${0.72 + index * 0.045}s
           cubic-bezier(0.16,1,0.3,1)
-          ${0.12 + index * 0.1}s,
-        opacity ${1.05 + index * 0.06}s ease
-          ${0.1 + index * 0.09}s,
-        filter ${1 + index * 0.05}s ease
-          ${0.1 + index * 0.09}s
+          ${0.04 + index * 0.05}s,
+        opacity ${0.62 + index * 0.04}s ease
+          ${0.04 + index * 0.05}s,
+        filter ${0.58 + index * 0.035}s ease
+          ${0.04 + index * 0.05}s
       `,
       zIndex: 1,
     };
@@ -378,11 +379,11 @@ export default function Projects() {
       setDisplayTab(newTab);
       setModalIndex(0);
       setAnimState("in");
-    }, 1250);
+    }, 780);
 
     queueTimeout(() => {
       setAnimState("idle");
-    }, 3200);
+    }, 1500);
   };
 
   const switchProject = useCallback(
@@ -561,8 +562,8 @@ export default function Projects() {
                 style={{
                   "--px": `calc(${pillPos.x}px - 50%)`,
                   "--py": `calc(${pillPos.y}px - 50%)`,
-                  "--dur": `${1.2 + index * 0.07}s`,
-                  "--del": `${0.12 + index * 0.1}s`,
+                  "--dur": `${0.72 + index * 0.045}s`,
+                  "--del": `${0.04 + index * 0.05}s`,
                   ...getCardStyle(animState, index, pillPos),
                 }}
                 onClick={() => animState === "idle" && openModal(index)}
@@ -613,176 +614,180 @@ export default function Projects() {
         )}
       </div>
 
-      {modalOpen && currentProject && (
-        <>
-          <div
-            className={`projects-modal-backdrop ${
-              modalTransition === "open"
-                ? "backdrop-open"
-                : modalTransition === "closing"
-                  ? "backdrop-closing"
-                  : "backdrop-closed"
-            }`}
-            style={{
-              "--ox": `${originPos.x}%`,
-              "--oy": `${originPos.y}%`,
-            }}
-            onClick={() => closeModal()}
-            aria-hidden="true"
-          />
+      {modalOpen &&
+        currentProject &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <>
+            <div
+              className={`projects-modal-backdrop ${
+                modalTransition === "open"
+                  ? "backdrop-open"
+                  : modalTransition === "closing"
+                    ? "backdrop-closing"
+                    : "backdrop-closed"
+              }`}
+              style={{
+                "--ox": `${originPos.x}%`,
+                "--oy": `${originPos.y}%`,
+              }}
+              onClick={() => closeModal()}
+              aria-hidden="true"
+            />
 
-          <button
-            type="button"
-            className="modal-close"
-            onClick={() => closeModal()}
-          >
-            {"\u2715  Close"}
-          </button>
+            <button
+              type="button"
+              className="modal-close"
+              onClick={() => closeModal()}
+            >
+              {"\u2715  Close"}
+            </button>
 
-          <div
-            className={`projects-modal-content ${
-              modalTransition === "open"
-                ? "modal-visible"
-                : modalTransition === "closing"
-                  ? "modal-hidden"
-                  : "modal-prime"
-            }`}
-          >
-            {switchDir && switchingProject && incomingProject ? (
-              <div
-                style={{
-                  position: "relative",
-                  width: "min(380px, calc(100vw - 32px))",
-                  aspectRatio: "9 / 16",
-                }}
-              >
+            <div
+              className={`projects-modal-content ${
+                modalTransition === "open"
+                  ? "modal-visible"
+                  : modalTransition === "closing"
+                    ? "modal-hidden"
+                    : "modal-prime"
+              }`}
+            >
+              {switchDir && switchingProject && incomingProject ? (
                 <div
-                  className="modal-video-shell"
                   style={{
-                    position: "absolute",
-                    inset: 0,
-                    transform:
-                      switchStage !== "active"
-                        ? "translateX(0%)"
-                        : `translateX(${switchDir === "right" ? "-24%" : "24%"})`,
-                    opacity: switchStage !== "active" ? 1 : 0,
-                    transition:
-                      "transform 760ms cubic-bezier(0.22, 1, 0.36, 1), opacity 760ms ease",
-                    willChange: "transform, opacity",
+                    position: "relative",
+                    width: "min(380px, calc(100vw - 32px))",
+                    aspectRatio: "9 / 16",
                   }}
                 >
-                  <ProjectFrame
-                    project={switchingProject}
-                    className="modal-frame-layer is-static"
-                  />
+                  <div
+                    className="modal-video-shell"
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      transform:
+                        switchStage !== "active"
+                          ? "translateX(0%)"
+                          : `translateX(${switchDir === "right" ? "-24%" : "24%"})`,
+                      opacity: switchStage !== "active" ? 1 : 0,
+                      transition:
+                        "transform 760ms cubic-bezier(0.22, 1, 0.36, 1), opacity 760ms ease",
+                      willChange: "transform, opacity",
+                    }}
+                  >
+                    <ProjectFrame
+                      project={switchingProject}
+                      className="modal-frame-layer is-static"
+                    />
+                  </div>
+
+                  <div
+                    className="modal-video-shell"
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      transform:
+                        switchStage !== "active"
+                          ? `translateX(${switchDir === "right" ? "24%" : "-24%"})`
+                          : "translateX(0%)",
+                      opacity: switchStage !== "active" ? 0 : 1,
+                      transition:
+                        "transform 760ms cubic-bezier(0.16, 1, 0.3, 1), opacity 760ms ease",
+                      willChange: "transform, opacity",
+                    }}
+                  >
+                    <ProjectFrame
+                      project={incomingProject}
+                      className={`modal-frame-layer is-static ${
+                        modalTransition === "open" ? "modal-bloom" : ""
+                      }`}
+                    />
+                  </div>
                 </div>
-
+              ) : (
                 <div
                   className="modal-video-shell"
                   style={{
-                    position: "absolute",
-                    inset: 0,
-                    transform:
-                      switchStage !== "active"
-                        ? `translateX(${switchDir === "right" ? "24%" : "-24%"})`
-                        : "translateX(0%)",
-                    opacity: switchStage !== "active" ? 0 : 1,
-                    transition:
-                      "transform 760ms cubic-bezier(0.16, 1, 0.3, 1), opacity 760ms ease",
-                    willChange: "transform, opacity",
+                    width: "min(380px, calc(100vw - 32px))",
                   }}
                 >
                   <ProjectFrame
-                    project={incomingProject}
+                    project={currentProject}
                     className={`modal-frame-layer is-static ${
                       modalTransition === "open" ? "modal-bloom" : ""
                     }`}
                   />
                 </div>
-              </div>
-            ) : (
-              <div
-                className="modal-video-shell"
+              )}
+
+              <button
+                type="button"
+                className="modal-nav"
                 style={{
-                  width: "min(380px, calc(100vw - 32px))",
+                  position: "absolute",
+                  top: "50%",
+                  left: isMobileView
+                    ? "clamp(-18px, -6vw, -10px)"
+                    : "clamp(-52px, -8vw, -34px)",
+                  transform: "translateY(-50%)",
+                  pointerEvents: "auto",
+                  zIndex: 220,
                 }}
+                onClick={() => switchProject("left")}
+                disabled={
+                  modalIndex === 0 || modalTransition !== "open" || !!switchDir
+                }
+                aria-label="Previous project"
               >
-                <ProjectFrame
-                  project={currentProject}
-                  className={`modal-frame-layer is-static ${
-                    modalTransition === "open" ? "modal-bloom" : ""
-                  }`}
-                />
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M14.5 6.5 9 12l5.5 5.5" />
+                </svg>
+              </button>
+
+              <button
+                type="button"
+                className="modal-nav"
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  right: isMobileView
+                    ? "clamp(-18px, -6vw, -10px)"
+                    : "clamp(-52px, -8vw, -34px)",
+                  transform: "translateY(-50%)",
+                  pointerEvents: "auto",
+                  zIndex: 220,
+                }}
+                onClick={() => switchProject("right")}
+                disabled={
+                  modalIndex === currentProjects.length - 1 ||
+                  modalTransition !== "open" ||
+                  !!switchDir
+                }
+                aria-label="Next project"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M9.5 6.5 15 12l-5.5 5.5" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="modal-meta">
+              <div className="modal-counter">
+                {modalIndex + 1} / {currentProjects.length}
               </div>
-            )}
 
-            <button
-              type="button"
-              className="modal-nav"
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: isMobileView
-                  ? "clamp(-18px, -6vw, -10px)"
-                  : "clamp(-52px, -8vw, -34px)",
-                transform: "translateY(-50%)",
-                pointerEvents: "auto",
-                zIndex: 220,
-              }}
-              onClick={() => switchProject("left")}
-              disabled={
-                modalIndex === 0 || modalTransition !== "open" || !!switchDir
-              }
-              aria-label="Previous project"
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M14.5 6.5 9 12l5.5 5.5" />
-              </svg>
-            </button>
-
-            <button
-              type="button"
-              className="modal-nav"
-              style={{
-                position: "absolute",
-                top: "50%",
-                right: isMobileView
-                  ? "clamp(-18px, -6vw, -10px)"
-                  : "clamp(-52px, -8vw, -34px)",
-                transform: "translateY(-50%)",
-                pointerEvents: "auto",
-                zIndex: 220,
-              }}
-              onClick={() => switchProject("right")}
-              disabled={
-                modalIndex === currentProjects.length - 1 ||
-                modalTransition !== "open" ||
-                !!switchDir
-              }
-              aria-label="Next project"
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M9.5 6.5 15 12l-5.5 5.5" />
-              </svg>
-            </button>
-          </div>
-
-          <div className="modal-meta">
-            <div className="modal-counter">
-              {modalIndex + 1} / {currentProjects.length}
+              <div className="modal-dots" aria-hidden="true">
+                {currentProjects.map((project, index) => (
+                  <span
+                    key={project.id}
+                    className={`modal-dot ${index === modalIndex ? "is-active" : ""}`}
+                  />
+                ))}
+              </div>
             </div>
-
-            <div className="modal-dots" aria-hidden="true">
-              {currentProjects.map((project, index) => (
-                <span
-                  key={project.id}
-                  className={`modal-dot ${index === modalIndex ? "is-active" : ""}`}
-                />
-              ))}
-            </div>
-          </div>
-        </>
-      )}
+          </>,
+          document.body,
+        )}
     </section>
   );
 }
