@@ -576,6 +576,90 @@
     border-color: rgba(255, 255, 255, 0.11);
 }
 
+/* Featured card glow */
+.ig-card {
+    border-color: rgba(247, 37, 133, 0.45);
+    background:
+        radial-gradient(
+            120% 80% at 15% 0%,
+            rgba(247, 37, 133, 0.12),
+            transparent 55%
+        ),
+        rgba(255, 255, 255, 0.03);
+    box-shadow:
+        0 0 0 1px rgba(247, 37, 133, 0.2),
+        0 0 26px rgba(247, 37, 133, 0.24),
+        0 0 60px rgba(247, 37, 133, 0.12);
+}
+.li-card {
+    border-color: rgba(67, 97, 238, 0.45);
+    background:
+        radial-gradient(
+            120% 80% at 85% 0%,
+            rgba(67, 97, 238, 0.12),
+            transparent 55%
+        ),
+        rgba(255, 255, 255, 0.03);
+    box-shadow:
+        0 0 0 1px rgba(67, 97, 238, 0.2),
+        0 0 26px rgba(67, 97, 238, 0.24),
+        0 0 60px rgba(67, 97, 238, 0.12);
+}
+.ig-card.card-visible {
+    animation: ig-card-glow 3.8s ease-in-out infinite;
+}
+.li-card.card-visible {
+    animation: li-card-glow 3.8s ease-in-out infinite;
+}
+.ig-card:hover {
+    animation: none;
+    border-color: rgba(247, 37, 133, 0.68);
+    box-shadow:
+        0 0 0 1px rgba(247, 37, 133, 0.34),
+        0 0 34px rgba(247, 37, 133, 0.33),
+        0 0 76px rgba(247, 37, 133, 0.16);
+}
+.li-card:hover {
+    animation: none;
+    border-color: rgba(67, 97, 238, 0.68);
+    box-shadow:
+        0 0 0 1px rgba(67, 97, 238, 0.34),
+        0 0 34px rgba(67, 97, 238, 0.33),
+        0 0 76px rgba(67, 97, 238, 0.16);
+}
+
+@keyframes ig-card-glow {
+    0%,
+    100% {
+        box-shadow:
+            0 0 0 1px rgba(247, 37, 133, 0.18),
+            0 0 22px rgba(247, 37, 133, 0.2),
+            0 0 52px rgba(247, 37, 133, 0.1);
+    }
+    50% {
+        box-shadow:
+            0 0 0 1px rgba(247, 37, 133, 0.28),
+            0 0 30px rgba(247, 37, 133, 0.31),
+            0 0 70px rgba(247, 37, 133, 0.15);
+    }
+}
+
+@keyframes li-card-glow {
+    0%,
+    100% {
+        box-shadow:
+            0 0 0 1px rgba(67, 97, 238, 0.18),
+            0 0 22px rgba(67, 97, 238, 0.2),
+            0 0 52px rgba(67, 97, 238, 0.1);
+    }
+    50% {
+        box-shadow:
+            0 0 0 1px rgba(67, 97, 238, 0.28),
+            0 0 30px rgba(67, 97, 238, 0.31),
+            0 0 70px rgba(67, 97, 238, 0.15);
+    }
+}
+
 /* Top accent lines */
 .social-card-accent {
     position: absolute;
